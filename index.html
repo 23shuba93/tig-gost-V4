@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="TIG ГОСТ v4">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="manifest" href="manifest.json">
+  <title>TIG Справочник Сварщика v4 (до 100 мм | ГОСТ / НАКС / Юхин Н.А.)</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --card-border: #334155;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-dark: #0284c7;
+      --amber: #f59e0b;
+      --green: #22c55e;
+      --red: #ef4444;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      padding: env(safe-area-inset-top, 14px) 12px calc(86px + env(safe-area-inset-bottom, 16px));
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+    }
+    header {
+      padding: 10px 4px 12px;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    header h1 {
+      font-size: 1.05rem;
+      margin: 0;
+      letter-spacing: 0.2px;
+    }
+    .badge {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 13px;
+      margin-bottom: 12px;
+    }
+    .card-title {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--muted);
+      margin: 0 0 10px 0;
+      font-weight: 700;
+    }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    select, input[type="number"] {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
+      background: #0b1120;
+      color: var(--text);
+      font-size: 0.92rem;
+      margin-bottom: 11px;
+      appearance: none;
+    }
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+      gap: 8px;
+    }
+    .slider-val-badge {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--accent);
+      background: #0b1120;
+      padding: 3px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      white-space: nowrap;
+    }
+    .inline-num-input {
+      width: 92px !important;
+      padding: 5px 8px !important;
+      margin-bottom: 0 !important;
+      text-align: center;
+      font-weight: 700;
+      color: var(--accent) !important;
+      font-size: 0.95rem !important;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+      height: 6px;
+      margin: 6px 0 10px;
+      cursor: pointer;
+    }
+    .step-btns {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 5px;
+      margin-bottom: 8px;
+    }
+    .preset-btns {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+    .step-btn {
+      background: #0b1120;
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 6px 0;
+      border-radius: 8px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+    }
+    .step-btn:active { background: var(--accent-dark); }
+    .joint-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    .joint-btn {
+      padding: 9px 8px;
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
+      background: #0b1120;
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+    }
+    .joint-btn.wide { grid-column: span 2; }
+    .joint-btn.active {
+      background: var(--accent-dark);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .sub-panel {
+      background: rgba(11, 17, 32, 0.65);
+      border: 1px dashed var(--card-border);
+      border-radius: 11px;
+      padding: 10px 11px;
+      margin-bottom: 12px;
+    }
+    .gost-banner {
+      background: linear-gradient(135deg, rgba(2,132,199,0.22), rgba(15,23,42,0.9));
+      border: 1px solid var(--accent);
+      border-radius: 11px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+    }
+    .gost-code {
+      font-size: 0.96rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 0.2px;
+    }
+    .gost-desc {
+      font-size: 0.78rem;
+      color: #cbd5e1;
+      margin-top: 3px;
+    }
+    .warn-banner {
+      background: rgba(239, 68, 68, 0.18);
+      border: 1px solid var(--red);
+      color: #fecaca;
+      border-radius: 10px;
+      padding: 9px 11px;
+      font-size: 0.8rem;
+      margin-bottom: 12px;
+      display: none;
+    }
+    .cooling-banner {
+      background: rgba(245, 158, 11, 0.16);
+      border: 1px solid var(--amber);
+      color: #fde68a;
+      border-radius: 10px;
+      padding: 8px 11px;
+      font-size: 0.79rem;
+      margin-bottom: 12px;
+      display: none;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 9px;
+    }
+    .stat-box {
+      background: #0b1120;
+      border: 1px solid var(--card-border);
+      border-radius: 11px;
+      padding: 9px 11px;
+    }
+    .stat-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+    .stat-val {
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .stat-sub {
+      font-size: 0.72rem;
+      color: var(--accent);
+      margin-top: 2px;
+    }
+    .tungsten-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: #0b1120;
+      border: 1px solid var(--card-border);
+      font-size: 0.84rem;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    .color-dot {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      display: inline-block;
+      border: 1px solid rgba(255,255,255,0.4);
+    }
+    .info-list {
+      margin: 0;
+      padding-left: 17px;
+      font-size: 0.84rem;
+      color: #cbd5e1;
+    }
+    .info-list li { margin-bottom: 6px; }
+    .cyclo-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px dashed var(--card-border);
+      font-size: 0.84rem;
+      gap: 8px;
+    }
+    .cyclo-row:last-child { border-bottom: none; }
+    .cyclo-key { color: var(--muted); }
+    .cyclo-val { font-weight: 600; color: var(--amber); text-align: right; }
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--card-border);
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      padding-bottom: env(safe-area-inset-bottom, 6px);
+      z-index: 100;
+    }
+    .nav-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      padding: 9px 2px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+    }
+    .nav-btn.active { color: var(--accent); }
+    .nav-icon { font-size: 1.15rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>⚡ TIG Справочник v4 (0,5–100 мм)</h1>
+  <span class="badge">ГОСТ / НАКС</span>
+</header>
+
+<!-- ВКЛАДКА 1: КАЛЬКУЛЯТОР РЕЖИМОВ -->
+<div id="tab-calc" class="tab-content active">
+  <div class="card">
+    <div class="card-title">1. Металл, вид проката и толщина до 100 мм</div>
+    <label for="metalSelect">Свариваемый металл и сплав</label>
+    <select id="metalSelect" onchange="onMetalChange()">
+      <option value="carbon">Углеродистая и низколегированная сталь (Ст10, 20, 09Г2С, 12Х1МФ)</option>
+      <option value="stainless">Высоколегированная нержавеющая сталь (12Х18Н10Т, 08Х18Н10Т)</option>
+      <option value="aluminum">Алюминий и его сплавы (АД1, АМг3, АМг5, АМг6, АК5)</option>
+      <option value="copper">Медь (М1р, М2р, М3р, М1к)</option>
+      <option value="brass">Латунь и бронза (Л68, ЛК80-3, БрКМц3-1, БрОЦС)</option>
+      <option value="titanium">Титан и его сплавы (ВТ1-00, ВТ1-0, ОТ4, ВТ6, ПТ-3В)</option>
+    </select>
+
+    <label>Вид свариваемого элемента (проката)</label>
+    <div class="joint-grid">
+      <div class="joint-btn active" id="el-sheet" onclick="setElement('sheet')">📄 Лист / Плита</div>
+      <div class="joint-btn" id="el-round_pipe" onclick="setElement('round_pipe')">⭕ Труба (круглая)</div>
+      <div class="joint-btn" id="el-square_pipe" onclick="setElement('square_pipe')">⬜ Квадратная труба</div>
+      <div class="joint-btn" id="el-rect_pipe" onclick="setElement('rect_pipe')">▭ Прямоугольная труба</div>
+    </div>
+
+    <!-- Блок диаметра круглой трубы -->
+    <div id="panel-round-pipe" class="sub-panel" style="display:none;">
+      <div class="slider-header">
+        <label for="pipeDiamSlider" style="margin:0;">Наружный диаметр трубы Dн (мм):</label>
+        <input type="number" id="pipeDiamInput" class="inline-num-input" min="10" max="1420" step="1" value="108" oninput="onPipeDiamNumber()">
+      </div>
+      <input type="range" id="pipeDiamSlider" min="10" max="1420" step="1" value="108" oninput="onPipeDiamSlider()">
+      <div class="preset-btns">
+        <button class="step-btn" onclick="setPipeDiam(25)">Ø25</button>
+        <button class="step-btn" onclick="setPipeDiam(57)">Ø57</button>
+        <button class="step-btn" onclick="setPipeDiam(108)">Ø108</button>
+        <button class="step-btn" onclick="setPipeDiam(219)">Ø219</button>
+        <button class="step-btn" onclick="setPipeDiam(325)">Ø325</button>
+        <button class="step-btn" onclick="setPipeDiam(530)">Ø530</button>
+        <button class="step-btn" onclick="setPipeDiam(1020)">Ø1020</button>
+      </div>
+      <div style="font-size:0.76rem; color:var(--muted);">
+        Длина кольцевого стыка: <strong style="color:var(--accent);" id="pipePerimInfo">0,34 м (339 мм)</strong>
+      </div>
+    </div>
+
+    <!-- Блок размеров квадратной трубы -->
+    <div id="panel-square-pipe" class="sub-panel" style="display:none;">
+      <div class="slider-header">
+        <label for="sqSideSlider" style="margin:0;">Сторона квадратной трубы A×A:</label>
+        <span class="slider-val-badge" id="sqSideDisplay">60×60 мм</span>
+      </div>
+      <input type="range" id="sqSideSlider" min="15" max="400" step="5" value="60" oninput="onSqSideInput()">
+      <div style="font-size:0.76rem; color:var(--muted);">
+        Периметр стыка профиля: <strong style="color:var(--accent);" id="sqPerimInfo">0,24 м (240 мм)</strong>
+      </div>
+    </div>
+
+    <!-- Блок размеров прямоугольной трубы -->
+    <div id="panel-rect-pipe" class="sub-panel" style="display:none;">
+      <div class="slider-header">
+        <label style="margin:0;">Сечение прямоугольной трубы A×B:</label>
+        <span class="slider-val-badge" id="rectSideDisplay">80×40 мм</span>
+      </div>
+      <label for="rectASlider">Ширина профиля A (мм)</label>
+      <input type="range" id="rectASlider" min="20" max="400" step="5" value="80" oninput="onRectSideInput()">
+      <label for="rectBSlider">Высота профиля B (мм)</label>
+      <input type="range" id="rectBSlider" min="15" max="300" step="5" value="40" oninput="onRectSideInput()">
+      <div style="font-size:0.76rem; color:var(--muted);">
+        Периметр стыка профиля: <strong style="color:var(--accent);" id="rectPerimInfo">0,24 м (240 мм)</strong>
+      </div>
+    </div>
+
+    <!-- Толщина стенки трубы или листа до 100 мм -->
+    <div class="slider-header">
+      <label for="thickSlider" id="thickLabelTitle" style="margin:0;">Толщина листа / плиты S (0,5–100 мм):</label>
+      <input type="number" id="thickInput" class="inline-num-input" min="0.5" max="100.0" step="0.1" value="3.0" oninput="onThickNumber()">
+    </div>
+    <input type="range" id="thickSlider" min="0.5" max="100.0" step="0.1" value="3.0" oninput="onThickSlider()">
+    <div class="step-btns">
+      <button class="step-btn" onclick="stepThickness(-5.0)">-5,0</button>
+      <button class="step-btn" onclick="stepThickness(-1.0)">-1,0</button>
+      <button class="step-btn" onclick="stepThickness(-0.1)">-0,1</button>
+      <button class="step-btn" onclick="stepThickness(0.1)">+0,1</button>
+      <button class="step-btn" onclick="stepThickness(1.0)">+1,0</button>
+      <button class="step-btn" onclick="stepThickness(5.0)">+5,0</button>
+    </div>
+    <div class="preset-btns">
+      <button class="step-btn" onclick="setThickness(1.5)">1,5 мм</button>
+      <button class="step-btn" onclick="setThickness(3.0)">3 мм</button>
+      <button class="step-btn" onclick="setThickness(6.0)">6 мм</button>
+      <button class="step-btn" onclick="setThickness(12.0)">12 мм</button>
+      <button class="step-btn" onclick="setThickness(25.0)">25 мм</button>
+      <button class="step-btn" onclick="setThickness(50.0)">50 мм</button>
+      <button class="step-btn" onclick="setThickness(100.0)">100 мм</button>
+    </div>
+
+    <label>Вид сварного соединения (ГОСТ 14771-76 / ГОСТ 16037-80)</label>
+    <div class="joint-grid">
+      <div class="joint-btn active" id="j-butt" onclick="setJoint('butt')">Стыковое (С)</div>
+      <div class="joint-btn" id="j-tee" onclick="setJoint('tee')">Тавровое (Т)</div>
+      <div class="joint-btn" id="j-corner" onclick="setJoint('corner')">Угловое (У)</div>
+      <div class="joint-btn" id="j-lap" onclick="setJoint('lap')">Нахлесточное (Н)</div>
+      <div class="joint-btn wide" id="j-pipe" onclick="setJoint('pipe')">⭕ Неповоротный кольцевой стык трубы (ГОСТ 16037-80)</div>
+    </div>
+
+    <label for="gasSelect">Вид защитного газа (стр. 3, 17, 29, 41, 43)</label>
+    <select id="gasSelect" onchange="calculateRegime()">
+      <option value="ar">Аргон 100% (Ar — ГОСТ 10157-79)</option>
+      <option value="ar_he">Смесь 35–40% Ar + 60–65% He (глубокое проплавление)</option>
+      <option value="he">Гелий 100% (He — ГОСТ 20461-75)</option>
+      <option value="ar_o2">Аргон + 2–5% O₂ (для высоколегированных сталей, стр. 29)</option>
+      <option value="n2">Азот 100% (N₂ — ГОСТ 9293-74*, только для меди, стр. 3, 41)</option>
+    </select>
+    <div id="gas-warn" class="warn-banner"></div>
+    <div id="cooling-warn" class="cooling-banner"></div>
+
+    <label for="posSelect">Пространственное положение шва (ГОСТ 11969-79 / НАКС)</label>
+    <select id="posSelect" onchange="calculateRegime()">
+      <option value="N1">Н1 — Нижнее стыковое (горизонтальная плоскость)</option>
+      <option value="N2">Н2 — Нижнее тавровое / угловое «в лодочку»</option>
+      <option value="G">Г — Горизонтальное на вертикальной плоскости</option>
+      <option value="V1">В1 — Вертикальное снизу вверх</option>
+      <option value="V2">В2 — Вертикальное сверху вниз (тонкий металл)</option>
+      <option value="P1">П1 — Потолочное стыковое</option>
+      <option value="P2">П2 — Потолочное тавровое / угловое в угол</option>
+      <option value="K1">К1 — Труба неповоротная горизонтальная (ось 0°, снизу вверх)</option>
+      <option value="K2">К2 — Труба неповоротная вертикальная (ось 90°, шов Г)</option>
+      <option value="N45">Н45 — Труба неповоротная под углом 45° (ось 45°)</option>
+    </select>
+  </div>
+
+  <!-- БАННЕР СТАНДАРТА ГОСТ -->
+  <div class="gost-banner">
+    <div class="stat-label" style="color:#bae6fd;">Условное обозначение по стандарту РФ:</div>
+    <div class="gost-code" id="res-gost-code">—</div>
+    <div class="gost-desc" id="res-gost-desc">—</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">2. Электрический режим и параметры заточки W-электрода</div>
+    <div class="grid-2">
+      <div class="stat-box">
+        <div class="stat-label">Рабочий сварочный ток (заполнение)</div>
+        <div class="stat-val" id="res-current">—</div>
+        <div class="stat-sub" id="res-root-current">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Диаметр электрода и напряжение</div>
+        <div class="stat-val" id="res-el-diam">—</div>
+        <div class="stat-sub" id="res-voltage">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Угол заточки электрода (α)</div>
+        <div class="stat-val" id="res-angle">—</div>
+        <div class="stat-sub" id="res-cone-len">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Притупление / Форма торца</div>
+        <div class="stat-val" id="res-trunc">—</div>
+        <div class="stat-sub" id="res-sharpen-note">—</div>
+      </div>
+    </div>
+    <div style="margin-top: 10px;">
+      <div class="stat-label">Марка электрода по ГОСТ 23949-80 (ISO 6848) и род тока</div>
+      <div id="res-tungsten-badge" class="tungsten-pill">—</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">3. Многопроходное заполнение, горелка и защитный газ</div>
+    <div class="grid-2">
+      <div class="stat-box">
+        <div class="stat-label">Диаметр присадки (корень / заполн.)</div>
+        <div class="stat-val" id="res-filler-diam">—</div>
+        <div class="stat-sub" id="res-passes">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Расход выбранного газа</div>
+        <div class="stat-val" id="res-gas-flow">—</div>
+        <div class="stat-sub" id="res-gas-type">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Диаметр сопла и охлаждение</div>
+        <div class="stat-val" id="res-nozzle">—</div>
+        <div class="stat-sub" id="res-purge">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Вылет W-электрода</div>
+        <div class="stat-val" id="res-stickout">—</div>
+        <div class="stat-sub" id="res-arc-len">Длина дуги: 1,5–3 мм</div>
+      </div>
+    </div>
+    <div style="margin-top: 10px;" class="stat-box">
+      <div class="stat-label">Рекомендуемые марки присадочного прутка (ГОСТ)</div>
+      <div style="font-size: 0.88rem; font-weight: 600; color: var(--accent);" id="res-filler-grades">—</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">4. Разделка кромок, подогрев и техника (до 100 мм)</div>
+    <ul class="info-list" id="res-notes"></ul>
+  </div>
+</div>
+
+<!-- ВКЛАДКА 2: РАСХОД МАТЕРИАЛОВ НА МЕТРАЖ / СТЫКИ (ДО 100 ММ) -->
+<div id="tab-norm" class="tab-content">
+  <div class="card">
+    <div class="card-title">Нормативный расход газа и вольфрама (S до 100 мм)</div>
+    <label for="normMetal">Группа свариваемого материала</label>
+    <select id="normMetal" onchange="calcNorms()">
+      <option value="aluminum">Алюминий и его сплавы (стр. 33 пособия)</option>
+      <option value="stainless">Высоколегированная сталь (стр. 31 пособия)</option>
+      <option value="carbon">Углеродистая / низколегированная сталь</option>
+      <option value="copper">Медь и сплавы</option>
+      <option value="titanium">Титан и сплавы (с учетом насадки и поддува)</option>
+    </select>
+
+    <label for="normGas">Используемый защитный газ</label>
+    <select id="normGas" onchange="calcNorms()">
+      <option value="ar">Аргон 100% (Ar)</option>
+      <option value="ar_he">Смесь 35% Ar + 65% He</option>
+      <option value="he">Гелий 100% (He)</option>
+      <option value="n2">Азот 100% (N₂ — для меди)</option>
+    </select>
+
+    <div class="slider-header">
+      <label for="normSlider" style="margin:0;">Толщина стенки / листа S (0,5–100 мм):</label>
+      <input type="number" id="normInput" class="inline-num-input" min="0.5" max="100.0" step="0.5" value="3.0" oninput="onNormNumber()">
+    </div>
+    <input type="range" id="normSlider" min="0.5" max="100.0" step="0.5" value="3.0" oninput="onNormSlider()">
+
+    <label for="weldLen">Общая длина сварного шва (пог. м)</label>
+    <input type="number" id="weldLen" value="10" min="0.1" step="0.5" oninput="calcNorms()">
+    <button class="step-btn" style="width:100%; padding:9px; margin-bottom:4px; color:var(--accent);" onclick="usePipePerimeterInNorms()">
+      🔄 Подставить толщину и периметр трубы / профиля из вкладки «Режимы»
+    </button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Расчет потребности сварочных материалов</div>
+    <div class="grid-2">
+      <div class="stat-box">
+        <div class="stat-label">Диаметр W-электрода и проходы</div>
+        <div class="stat-val" id="norm-el">—</div>
+        <div class="stat-sub" id="norm-passes-sub">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Суммарный расход вольфрама</div>
+        <div class="stat-val" id="norm-w-val">—</div>
+        <div class="stat-sub" id="norm-w-unit">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Общий расход газа (все проходы)</div>
+        <div class="stat-val" id="norm-ar-val">—</div>
+        <div class="stat-sub" id="norm-ar-sub">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Количество баллонов (40 л, 15 МПа)</div>
+        <div class="stat-val" id="norm-cyl">—</div>
+        <div class="stat-sub" id="norm-cyl-sub">Запас 1 баллона ~6200 л</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ВКЛАДКА 3: ЦИКЛОГРАММА -->
+<div id="tab-cyclo" class="tab-content">
+  <div class="card">
+    <div class="card-title">Циклограмма под выбранный режим</div>
+    <div class="cyclo-row">
+      <span class="cyclo-key">1. Предварительная продувка газом</span>
+      <span class="cyclo-val" id="cyc-preflow">—</span>
+    </div>
+    <div class="cyclo-row">
+      <span class="cyclo-key">2. Ток зажигания (HF / контактно)</span>
+      <span class="cyclo-val">7–10 А (ТИР-300Д: с 5 А за 0,4 с)</span>
+    </div>
+    <div class="cyclo-row">
+      <span class="cyclo-key">3. Время плавного нарастания тока</span>
+      <span class="cyclo-val">0,4–2,0 с</span>
+    </div>
+    <div class="cyclo-row">
+      <span class="cyclo-key">4. Ток корневого прохода / заполнения</span>
+      <span class="cyclo-val" id="cyc-main">—</span>
+    </div>
+    <div class="cyclo-row">
+      <span class="cyclo-key">5. Импульсный режим (Ток импульса / паузы)</span>
+      <span class="cyclo-val" id="cyc-pulse">—</span>
+    </div>
+    <div class="cyclo-row">
+      <span class="cyclo-key">6. Длительность импульса и паузы</span>
+      <span class="cyclo-val">0,01 до 1–3 с (глубина 10–12 раз)</span>
+    </div>
+    <div class="cyclo-row">
+      <span class="cyclo-key">7. Спад тока (заварка кратера)</span>
+      <span class="cyclo-val" id="cyc-crater">—</span>
+    </div>
+    <div class="cyclo-row">
+      <span class="cyclo-key">8. Постпродувка газом после гашения</span>
+      <span class="cyclo-val" id="cyc-postflow">—</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Баланс полупериодов переменного тока (стр. 9)</div>
+    <ul class="info-list">
+      <li><strong>Отрицательный импульс 70% / Положительный 30%:</strong> максимальная глубина проплавления основного металла (особенно важно для толстостенного алюминия).</li>
+      <li><strong>Положительный импульс 70% / Отрицательный 30%:</strong> усиленное «катодное распыление» окисной пленки Al₂O₃ (Tпл = 2060 °C).</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ВКЛАДКА 4: ТЕХНИКА И БОЛЬШИЕ ТОЛЩИНЫ -->
+<div id="tab-tech" class="tab-content">
+  <div class="card">
+    <div class="card-title">Сварка толстостенных труб и плит (S = 16–100 мм)</div>
+    <ul class="info-list">
+      <li><strong>Многослойное заполнение (стр. 27, 42, 48):</strong> при ручной TIG-сварке высота одного наплавленного слоя составляет <strong>2,0–2,5 мм</strong>. При толщинах свыше 16–25 мм применяют двухстороннюю Х-образную (С21), криволинейную U-образную (С15, С20) или узкощелевую ступенчатую разделку (С25, С27 по ГОСТ 14771-76 и С20, С39 по ГОСТ 16037-80).</li>
+      <li><strong>Корень и заполнение:</strong> корневые 1–2 прохода выполняют на умеренном токе (90–160 А) без поперечных колебаний горелки с гарантированным проплавлением притупления и внутренним поддувом аргона. Последующие слои накладывают с колебательными движениями горелки в пределах ширины разделки или раскладкой по 2–4 ниточных валика в каждом слое.</li>
+      <li><strong>Комбинированная технология для S &gt; 25–100 мм:</strong> на особо толстостенных паропроводах и сосудах давления корневой и подварочный слои (толщиной 4–6 мм) выполняют аргонодуговой сваркой (TIG / ИНп), после чего заполнение разделки ведут многопроходным TIG на повышенных токах с гелиевой смесью либо механизированными способами.</li>
+      <li><strong>Водяное охлаждение горелки (стр. 13–14):</strong> при сварочном токе свыше 150 А обязательно применение горелок с жидкостным (водяным или антифризным) охлаждением и медным охлаждаемым соплом (ГСН-1 на 450 А, ГР-6 на 400 А, ГР-10 и ГДС-500В на 500 А).</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Свойства защитных газов (стр. 3, 17, 29, 41, 43)</div>
+    <ul class="info-list">
+      <li><strong>Аргон (ГОСТ 10157-79):</strong> тяжелее воздуха, обеспечивает отличную стабильность дуги.</li>
+      <li><strong>Гелий (ГОСТ 20461-75) и смесь 35% Ar + 65% He:</strong> дуга выделяет в 1,5–2 раза больше энергии, чем в чистом аргоне, что критически важно для проплавления толстостенных деталей (20–100 мм) из алюминия, меди и сталей.</li>
+      <li><strong>Азот (ГОСТ 9293-74*):</strong> используется только для сварки меди (мощность дуги в 3–4 раза выше, чем в аргоне).</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ВКЛАДКА 5: СПРАВОЧНИК -->
+<div id="tab-ref" class="tab-content">
+  <div class="card">
+    <div class="card-title">Максимальный ток для W-электродов Ø 2–10 мм (стр. 3)</div>
+    <ul class="info-list">
+      <li><strong>Ø 2,0 мм (DC-):</strong> ЭВЛ — до 80 А, ЭВТ — до 120 А, ЭВИ — до 180 А.</li>
+      <li><strong>Ø 3,0 мм (DC- / AC):</strong> DC-: ЭВЛ — 230 А, ЭВТ — 300 А, ЭВИ — 380 А | AC: ЭВИ — до 180 А.</li>
+      <li><strong>Ø 4,0 мм (DC- / AC):</strong> DC-: ЭВЛ — 500 А, ЭВТ — 590 А, ЭВИ — 620 А | AC: ЭВЧ — 180 А, ЭВЛ — 170 А, ЭВИ — 220 А.</li>
+      <li><strong>Ø 5,0 мм (DC- / AC):</strong> DC-: ЭВЛ — 720 А, ЭВТ — 810 А, ЭВИ — 920 А | AC: ЭВЛ — 210 А, ЭВИ — 270 А.</li>
+      <li><strong>Ø 6,0 мм (DC- / AC):</strong> DC-: ЭВЛ — 900 А, ЭВТ — 1000 А, ЭВИ — 1500 А | AC: ЭВЧ/ЭВЛ — 250 А, ЭВИ — 340 А.</li>
+      <li><strong>Ø 8,0–10,0 мм (AC / DC+):</strong> AC: ЭВЧ — 380–450 А, ЭВЛ — 360–520 А, ЭВИ — 480–650 А.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Контроль защиты титана по цвету шва (стр. 45)</div>
+    <ul class="info-list">
+      <li><strong>Серебристый или соломенный:</strong> отличная газовая защита.</li>
+      <li><strong>Желто-голубой:</strong> нарушение защиты (допустимо лишь в отдельных случаях).</li>
+      <li><strong>Темно-синий или синевато-серый с серым налетом:</strong> низкое качество шва, брак.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- НИЖНЯЯ НАВИГАЦИЯ -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="switchTab('calc', this)">
+    <span class="nav-icon">🎛️</span>Режимы
+  </button>
+  <button class="nav-btn" onclick="switchTab('norm', this)">
+    <span class="nav-icon">🧮</span>Расход
+  </button>
+  <button class="nav-btn" onclick="switchTab('cyclo', this)">
+    <span class="nav-icon">📈</span>Цикл
+  </button>
+  <button class="nav-btn" onclick="switchTab('tech', this)">
+    <span class="nav-icon">📐</span>До 100 мм
+  </button>
+  <button class="nav-btn" onclick="switchTab('ref', this)">
+    <span class="nav-icon">📘</span>Справка
+  </button>
+</nav>
+
+<script>
+const METALS = {
+  carbon: {
+    name: "Углеродистая и низколегированная сталь",
+    polarity: "DC- (Прямая полярность)",
+    tungsten: { name: "ЭВЛ (WL-20) / ЭВТ (WT-20) / ЭВИ (WY-20)", color: "#3b82f6" },
+    fillerGrades: "Св-08Г2С, Св-08ГС, Св-08ХМ, Св-08ХМФА, Св-08ХГСМФА",
+    preflow: "1–2 с",
+    postflow: "10–15 с",
+    maxS: 100.0,
+    points: [
+      { s: 0.8, i: 70, el: 2.0, fil: 1.6, gas: 9, noz: 9, pass: 1 },
+      { s: 1.0, i: 80, el: 2.0, fil: 1.6, gas: 9, noz: 9, pass: 1 },
+      { s: 2.0, i: 110, el: 3.0, fil: 1.6, gas: 9, noz: 11, pass: 1 },
+      { s: 4.0, i: 120, el: 3.5, fil: 2.0, gas: 11, noz: 12, pass: 2 },
+      { s: 6.0, i: 140, el: 4.0, fil: 2.0, gas: 11, noz: 14, pass: 3 },
+      { s: 8.0, i: 145, el: 4.0, fil: 2.0, gas: 12, noz: 14, pass: 6 },
+      { s: 10.0, i: 155, el: 4.0, fil: 2.5, gas: 12, noz: 16, pass: 6 },
+      { s: 16.0, i: 185, el: 4.0, fil: 3.0, gas: 14, noz: 16, pass: 10 },
+      { s: 25.0, i: 220, el: 4.5, fil: 3.0, gas: 15, noz: 18, pass: 16 },
+      { s: 40.0, i: 250, el: 5.0, fil: 3.5, gas: 16, noz: 18, pass: 28 },
+      { s: 60.0, i: 280, el: 5.0, fil: 4.0, gas: 18, noz: 20, pass: 45 },
+      { s: 80.0, i: 300, el: 5.5, fil: 4.0, gas: 19, noz: 20, pass: 64 },
+      { s: 100.0, i: 320, el: 6.0, fil: 4.0, gas: 20, noz: 22, pass: 85 }
+    ]
+  },
+  stainless: {
+    name: "Высоколегированная (нержавеющая) сталь",
+    polarity: "DC- (Прямая полярность)",
+    tungsten: { name: "ЭВЛ (WL-20) / ЭВИ (WY-20)", color: "#1d4ed8" },
+    fillerGrades: "Св-01Х19Н9, Св-04Х19Н9, Св-07Х19Н10Б, Св-07Х25Н13",
+    preflow: "1–3 с",
+    postflow: "10–15 с",
+    maxS: 100.0,
+    points: [
+      { s: 0.5, i: 40, el: 1.0, fil: 1.0, gas: 7, noz: 8, pass: 1 },
+      { s: 1.0, i: 65, el: 1.5, fil: 1.2, gas: 7, noz: 8, pass: 1 },
+      { s: 2.0, i: 95, el: 2.5, fil: 1.6, gas: 9, noz: 10, pass: 1 },
+      { s: 4.0, i: 125, el: 3.5, fil: 2.0, gas: 11, noz: 12, pass: 2 },
+      { s: 6.0, i: 140, el: 4.0, fil: 2.5, gas: 11, noz: 14, pass: 3 },
+      { s: 10.0, i: 160, el: 4.0, fil: 3.0, gas: 12, noz: 16, pass: 5 },
+      { s: 16.0, i: 180, el: 4.5, fil: 3.0, gas: 14, noz: 16, pass: 9 },
+      { s: 25.0, i: 205, el: 4.5, fil: 3.0, gas: 15, noz: 18, pass: 16 },
+      { s: 40.0, i: 230, el: 5.0, fil: 3.5, gas: 16, noz: 18, pass: 28 },
+      { s: 60.0, i: 250, el: 5.0, fil: 3.5, gas: 17, noz: 20, pass: 46 },
+      { s: 80.0, i: 265, el: 5.5, fil: 4.0, gas: 18, noz: 20, pass: 68 },
+      { s: 100.0, i: 280, el: 6.0, fil: 4.0, gas: 20, noz: 22, pass: 90 }
+    ]
+  },
+  aluminum: {
+    name: "Алюминий и его сплавы",
+    polarity: "AC (Переменный с осциллятором)",
+    tungsten: { name: "ЭВЧ (WP) / ЭВЛ (WL-15) / ЭВИ (WY-20)", color: "#22c55e" },
+    fillerGrades: "Св-АМг3, Св-АМг5, Св-АМг6, Св-АК5, Св-А1, Св-1557",
+    preflow: "3–5 с",
+    postflow: "7–12 с",
+    maxS: 100.0,
+    points: [
+      { s: 1.0, i: 60, el: 1.5, fil: 1.6, gas: 6, noz: 10, pass: 1 },
+      { s: 2.0, i: 85, el: 2.0, fil: 2.5, gas: 6, noz: 11, pass: 1 },
+      { s: 3.0, i: 125, el: 3.0, fil: 3.0, gas: 8, noz: 12, pass: 1 },
+      { s: 4.0, i: 180, el: 4.0, fil: 3.5, gas: 9, noz: 14, pass: 2 },
+      { s: 6.0, i: 270, el: 5.0, fil: 4.0, gas: 10, noz: 16, pass: 2 },
+      { s: 8.0, i: 330, el: 5.5, fil: 4.5, gas: 12, noz: 17, pass: 2 },
+      { s: 10.0, i: 380, el: 6.5, fil: 4.5, gas: 14, noz: 18, pass: 3 },
+      { s: 15.0, i: 420, el: 7.0, fil: 5.0, gas: 17, noz: 20, pass: 6 },
+      { s: 25.0, i: 515, el: 8.0, fil: 6.0, gas: 19, noz: 22, pass: 8 },
+      { s: 40.0, i: 550, el: 8.5, fil: 6.5, gas: 21, noz: 22, pass: 16 },
+      { s: 60.0, i: 580, el: 9.0, fil: 7.0, gas: 23, noz: 24, pass: 26 },
+      { s: 80.0, i: 610, el: 9.5, fil: 7.5, gas: 24, noz: 24, pass: 38 },
+      { s: 100.0, i: 640, el: 10.0, fil: 8.0, gas: 25, noz: 24, pass: 52 }
+    ]
+  },
+  copper: {
+    name: "Медь и медные сплавы",
+    polarity: "DC- (Прямая полярность)",
+    tungsten: { name: "ЭВЛ (WL-20) / ЭВИ (WY-20) / ЭВТ (WT-20)", color: "#ef4444" },
+    fillerGrades: "БрКМц3-1, МНЖКТ 5-1-0,2-0,2, БрОЦ4-3, БрАЖНМн 8,5-4-5-1,5",
+    preflow: "2–4 с",
+    postflow: "10–15 с",
+    maxS: 100.0,
+    points: [
+      { s: 1.2, i: 125, el: 2.5, fil: 1.6, gas: 8, noz: 10, pass: 1 },
+      { s: 1.5, i: 145, el: 3.0, fil: 2.0, gas: 8, noz: 11, pass: 1 },
+      { s: 2.5, i: 225, el: 3.5, fil: 3.0, gas: 9, noz: 12, pass: 1 },
+      { s: 3.0, i: 235, el: 4.0, fil: 3.0, gas: 9, noz: 13, pass: 1 },
+      { s: 6.0, i: 300, el: 5.0, fil: 4.0, gas: 10, noz: 15, pass: 2 },
+      { s: 10.0, i: 350, el: 5.5, fil: 4.5, gas: 10, noz: 16, pass: 3 },
+      { s: 12.0, i: 380, el: 6.0, fil: 5.0, gas: 10, noz: 18, pass: 4 },
+      { s: 20.0, i: 450, el: 6.0, fil: 5.5, gas: 12, noz: 20, pass: 6 },
+      { s: 25.0, i: 500, el: 6.0, fil: 6.0, gas: 13, noz: 22, pass: 8 },
+      { s: 40.0, i: 540, el: 6.0, fil: 6.0, gas: 15, noz: 22, pass: 16 },
+      { s: 60.0, i: 570, el: 6.0, fil: 6.0, gas: 17, noz: 24, pass: 28 },
+      { s: 80.0, i: 590, el: 6.0, fil: 6.0, gas: 18, noz: 24, pass: 42 },
+      { s: 100.0, i: 600, el: 6.0, fil: 6.0, gas: 20, noz: 24, pass: 58 }
+    ]
+  },
+  brass: {
+    name: "Латунь и бронза",
+    polarity: "DC- (Прямая) / AC",
+    tungsten: { name: "ЭВЛ (WL-20) / ЭВТ (WT-20) / ЭВИ (WY-20)", color: "#eab308" },
+    fillerGrades: "БрКМц3-1, БрОЦ4-3, ЛК62-0,5, ЛО62-1, ЛК80-3",
+    preflow: "1–3 с",
+    postflow: "8–14 с",
+    maxS: 100.0,
+    points: [
+      { s: 1.0, i: 95, el: 2.0, fil: 1.6, gas: 7, noz: 10, pass: 1 },
+      { s: 1.5, i: 130, el: 2.5, fil: 1.6, gas: 8, noz: 10, pass: 1 },
+      { s: 2.0, i: 155, el: 3.0, fil: 2.0, gas: 9, noz: 11, pass: 1 },
+      { s: 2.5, i: 195, el: 3.0, fil: 2.0, gas: 10, noz: 12, pass: 1 },
+      { s: 3.0, i: 215, el: 3.5, fil: 3.0, gas: 11, noz: 12, pass: 1 },
+      { s: 6.0, i: 280, el: 4.0, fil: 4.0, gas: 12, noz: 14, pass: 2 },
+      { s: 12.0, i: 350, el: 5.0, fil: 4.5, gas: 14, noz: 16, pass: 4 },
+      { s: 25.0, i: 410, el: 5.5, fil: 5.0, gas: 16, noz: 18, pass: 10 },
+      { s: 50.0, i: 450, el: 6.0, fil: 5.5, gas: 18, noz: 20, pass: 24 },
+      { s: 100.0, i: 490, el: 6.0, fil: 6.0, gas: 20, noz: 22, pass: 56 }
+    ]
+  },
+  titanium: {
+    name: "Титан и его сплавы",
+    polarity: "DC- (Прямая полярность)",
+    tungsten: { name: "ЭВИ (WY-20) / ЭВЛ (WL-20)", color: "#1d4ed8" },
+    fillerGrades: "ВТ1-00св, ВТ20-1св, СПТ-2, СП-15",
+    preflow: "3–6 с",
+    postflow: "До остывания < 250–300 °C (15–35 с)",
+    maxS: 100.0,
+    points: [
+      { s: 0.8, i: 45, el: 1.5, fil: 1.2, gas: 9, noz: 12, pass: 1 },
+      { s: 1.0, i: 50, el: 1.6, fil: 1.2, gas: 10, noz: 12, pass: 1 },
+      { s: 2.0, i: 80, el: 2.0, fil: 1.6, gas: 11, noz: 14, pass: 1 },
+      { s: 3.0, i: 125, el: 3.0, fil: 2.0, gas: 13, noz: 16, pass: 2 },
+      { s: 4.5, i: 135, el: 3.5, fil: 2.0, gas: 14, noz: 18, pass: 2 },
+      { s: 7.0, i: 150, el: 4.0, fil: 2.5, gas: 16, noz: 18, pass: 3 },
+      { s: 10.0, i: 180, el: 4.0, fil: 2.5, gas: 17, noz: 20, pass: 10 },
+      { s: 12.0, i: 195, el: 4.5, fil: 2.5, gas: 18, noz: 20, pass: 14 },
+      { s: 16.0, i: 215, el: 5.0, fil: 3.0, gas: 19, noz: 22, pass: 18 },
+      { s: 20.0, i: 255, el: 5.0, fil: 3.0, gas: 20, noz: 22, pass: 25 },
+      { s: 35.0, i: 270, el: 5.5, fil: 3.5, gas: 21, noz: 22, pass: 42 },
+      { s: 60.0, i: 285, el: 6.0, fil: 4.0, gas: 22, noz: 24, pass: 72 },
+      { s: 100.0, i: 300, el: 6.0, fil: 4.0, gas: 24, noz: 24, pass: 120 }
+    ]
+  }
+};
+
+const GASES = {
+  ar: {
+    name: "Аргон 100% (ГОСТ 10157-79)",
+    flowMult: 1.0,
+    currMult: 1.0,
+    voltage: "11–16 В",
+    arcLen: "1,5–3,0 мм",
+    note: "Базовый инертный газ (тяжелее воздуха), стабильное горение дуги."
+  },
+  ar_he: {
+    name: "Смесь 35–40% Ar + 60–65% He",
+    flowMult: 1.4,
+    currMult: 0.86,
+    voltage: "14–19 В",
+    arcLen: "1,5–3,0 мм",
+    note: "Оптимальная смесь (стр. 3): аргон дает стабильность дуги, гелий — глубокое проплавление толстостенных элементов. Требуемый ток ниже на ~14%, расход выше в 1,4 раза."
+  },
+  he: {
+    name: "Гелий 100% (ГОСТ 20461-75)",
+    flowMult: 1.85,
+    currMult: 0.78,
+    voltage: "18–24 В (Uхх до 120–200 В)",
+    arcLen: "1,5–3,0 мм",
+    note: "В 1,5–2 раза больше тепловой энергии на дуге (стр. 3, 41). Рекомендуется для больших толщин (S > 12–100 мм); расход газа увеличен в 1,8–2 раза."
+  },
+  ar_o2: {
+    name: "Аргон + 2–5% Кислорода (O₂)",
+    flowMult: 1.0,
+    currMult: 0.96,
+    voltage: "11–15 В",
+    arcLen: "1,5–2,5 мм",
+    note: "Применяется при сварке высоколегированных сталей для обеспечения плотности шва и борьбы с пористостью (стр. 29)."
+  },
+  n2: {
+    name: "Азот 100% (ГОСТ 9293-74*)",
+    flowMult: 1.8,
+    currMult: 0.75,
+    voltage: "22–30 В",
+    arcLen: "до 12 мм (угольный эл.)",
+    note: "Азот применяется ТОЛЬКО для сварки меди (стр. 3, 41, 43): мощность дуги возрастает в 3–4 раза, расход 15–20 л/мин."
+  }
+};
+
+const POSITIONS = {
+  N1: { code: "Н1", factor: 1.00, text: "Нижнее положение (Н1): сварка справа налево. Корень — без поперечных колебаний; при многопроходном заполнении толщин свыше 6–100 мм допускаются плавные колебания в пределах разделки." },
+  N2: { code: "Н2", factor: 1.00, text: "Нижнее «в лодочку» (Н2): симметричный прогрев обеих полок, присадка подается в передний край ванны." },
+  G:  { code: "Г",  factor: 0.88, text: "Горизонтальное положение (Г): ток снижен на 12%. Шов выполняют справа налево «от себя» или «на себя». При большой толщине валики накладывают последовательно от нижней кромки разделки к верхней." },
+  V1: { code: "В1", factor: 0.85, text: "Вертикальное снизу вверх (В1): ток снижен на 15%. Поступательное ведение снизу вверх, присадочный пруток подают сверху (по траектории 1–6)." },
+  V2: { code: "В2", factor: 0.90, text: "Вертикальное сверху вниз (В2): применяется только для тонкостенных соединений (до 3–4 мм)." },
+  P1: { code: "П1", factor: 0.82, text: "Потолочное стыковое (П1): ток снижен на 18%. Сварку ведут строго «на себя» для обзора ванны, горелку держат почти вертикально." },
+  P2: { code: "П2", factor: 0.84, text: "Потолочное угловое/тавровое (П2): ток снижен на 16%. Ведение «на себя» короткой дугой без поперечных разводов." },
+  K1: { code: "К1 (В1 неповоротный)", factor: 0.85, text: "Неповоротный стык трубы с горизонтальной осью (К1): сварка полукольцами снизу вверх от «6 часов» через «3/9 часов» к «12 часам» со смещением замков в слоях на 15–20 мм." },
+  K2: { code: "К2 (Г неповоротный)", factor: 0.88, text: "Неповоротный стык трубы с вертикальной осью (К2): горизонтальный кольцевой многослойный шов с упреждением дуги на верхнюю кромку." },
+  N45:{ code: "Н45", factor: 0.85, text: "Неповоротный стык трубы под углом 45° (Н45): аттестационное положение НАКС; проход снизу вверх по периметру с внутренним поддувом корня." }
+};
+
+let currentElement = 'sheet';
+let currentJoint = 'butt';
+
+function setElement(elType) {
+  currentElement = elType;
+  ['sheet', 'round_pipe', 'square_pipe', 'rect_pipe'].forEach(id => {
+    document.getElementById('el-' + id).classList.toggle('active', id === elType);
+  });
+  document.getElementById('panel-round-pipe').style.display = (elType === 'round_pipe') ? 'block' : 'none';
+  document.getElementById('panel-square-pipe').style.display = (elType === 'square_pipe') ? 'block' : 'none';
+  document.getElementById('panel-rect-pipe').style.display = (elType === 'rect_pipe') ? 'block' : 'none';
+
+  const lbl = document.getElementById('thickLabelTitle');
+  if (elType === 'sheet') {
+    lbl.textContent = "Толщина листа / плиты S (0,5–100 мм):";
+  } else {
+    lbl.textContent = "Толщина стенки трубы S (0,5–100 мм):";
+  }
+
+  if (elType === 'round_pipe' && currentJoint === 'butt') {
+    setJoint('pipe');
+  } else if (elType !== 'round_pipe' && currentJoint === 'pipe') {
+    setJoint('butt');
+  } else {
+    calculateRegime();
+  }
+}
+
+function setPipeDiam(d) {
+  document.getElementById('pipeDiamSlider').value = d;
+  document.getElementById('pipeDiamInput').value = d;
+  updatePipePerimDisplay(d);
+  calculateRegime();
+}
+
+function onPipeDiamSlider() {
+  const d = parseInt(document.getElementById('pipeDiamSlider').value) || 108;
+  document.getElementById('pipeDiamInput').value = d;
+  updatePipePerimDisplay(d);
+  calculateRegime();
+}
+
+function onPipeDiamNumber() {
+  let d = parseInt(document.getElementById('pipeDiamInput').value) || 10;
+  d = Math.max(10, Math.min(1420, d));
+  document.getElementById('pipeDiamSlider').value = d;
+  updatePipePerimDisplay(d);
+  calculateRegime();
+}
+
+function updatePipePerimDisplay(d) {
+  const perimMm = Math.round(Math.PI * d);
+  const perimM = (perimMm / 1000).toFixed(2).replace('.', ',');
+  document.getElementById('pipePerimInfo').textContent = `${perimM} м (${perimMm} мм)`;
+}
+
+function onSqSideInput() {
+  const a = parseInt(document.getElementById('sqSideSlider').value);
+  const perimMm = 4 * a;
+  const perimM = (perimMm / 1000).toFixed(2).replace('.', ',');
+  document.getElementById('sqSideDisplay').textContent = `${a}×${a} мм`;
+  document.getElementById('sqPerimInfo').textContent = `${perimM} м (${perimMm} мм)`;
+  calculateRegime();
+}
+
+function onRectSideInput() {
+  const a = parseInt(document.getElementById('rectASlider').value);
+  const b = parseInt(document.getElementById('rectBSlider').value);
+  const perimMm = 2 * (a + b);
+  const perimM = (perimMm / 1000).toFixed(2).replace('.', ',');
+  document.getElementById('rectSideDisplay').textContent = `${a}×${b} мм`;
+  document.getElementById('rectPerimInfo').textContent = `${perimM} м (${perimMm} мм)`;
+  calculateRegime();
+}
+
+function setJoint(j) {
+  currentJoint = j;
+  ['butt','tee','corner','lap','pipe'].forEach(id => {
+    document.getElementById('j-' + id).classList.toggle('active', id === j);
+  });
+  const posSel = document.getElementById('posSelect');
+  if (j === 'pipe') {
+    if (currentElement !== 'round_pipe') {
+      currentElement = 'round_pipe';
+      ['sheet', 'round_pipe', 'square_pipe', 'rect_pipe'].forEach(id => {
+        document.getElementById('el-' + id).classList.toggle('active', id === 'round_pipe');
+      });
+      document.getElementById('panel-round-pipe').style.display = 'block';
+      document.getElementById('panel-square-pipe').style.display = 'none';
+      document.getElementById('panel-rect-pipe').style.display = 'none';
+      document.getElementById('thickLabelTitle').textContent = "Толщина стенки трубы S (0,5–100 мм):";
+    }
+    if (!['K1','K2','N45'].includes(posSel.value)) posSel.value = 'K1';
+  } else if (j !== 'pipe' && ['K1','K2','N45'].includes(posSel.value)) {
+    posSel.value = 'N1';
+  }
+  calculateRegime();
+}
+
+function onMetalChange() {
+  calculateRegime();
+}
+
+function setThickness(val) {
+  const v = Math.max(0.5, Math.min(100.0, val));
+  document.getElementById('thickSlider').value = v;
+  document.getElementById('thickInput').value = v.toFixed(1);
+  ensurePipeDiameterForWall(v);
+  calculateRegime();
+}
+
+function stepThickness(delta) {
+  const slider = document.getElementById('thickSlider');
+  let val = Math.round((parseFloat(slider.value) + delta) * 10) / 10;
+  val = Math.max(0.5, Math.min(100.0, val));
+  slider.value = val;
+  document.getElementById('thickInput').value = val.toFixed(1);
+  ensurePipeDiameterForWall(val);
+  calculateRegime();
+}
+
+function onThickSlider() {
+  const val = parseFloat(document.getElementById('thickSlider').value);
+  document.getElementById('thickInput').value = val.toFixed(1);
+  ensurePipeDiameterForWall(val);
+  calculateRegime();
+}
+
+function onThickNumber() {
+  let val = parseFloat(document.getElementById('thickInput').value);
+  if (isNaN(val)) return;
+  val = Math.max(0.5, Math.min(100.0, val));
+  document.getElementById('thickSlider').value = val;
+  ensurePipeDiameterForWall(val);
+  calculateRegime();
+}
+
+function ensurePipeDiameterForWall(s) {
+  // Геометрическое условие для трубы: наружный диаметр Dн должен быть больше 2.2 * S
+  const minD = Math.ceil(s * 2.4);
+  const pipeSlider = document.getElementById('pipeDiamSlider');
+  if (parseInt(pipeSlider.value) < minD) {
+    pipeSlider.value = minD;
+    document.getElementById('pipeDiamInput').value = minD;
+    updatePipePerimDisplay(minD);
+  }
+}
+
+function interpPoints(points, s) {
+  if (s <= points[0].s) return { ...points[0] };
+  if (s >= points[points.length - 1].s) return { ...points[points.length - 1] };
+  for (let idx = 0; idx < points.length - 1; idx++) {
+    const p1 = points[idx];
+    const p2 = points[idx + 1];
+    if (s >= p1.s && s <= p2.s) {
+      const t = (s - p1.s) / (p2.s - p1.s);
+      return {
+        s: s,
+        i: Math.round(p1.i + t * (p2.i - p1.i)),
+        el: Math.round((p1.el + t * (p2.el - p1.el)) * 2) / 2,
+        fil: Math.round((p1.fil + t * (p2.fil - p1.fil)) * 2) / 2,
+        gas: Math.round(p1.gas + t * (p2.gas - p1.gas)),
+        noz: Math.round(p1.noz + t * (p2.noz - p1.noz)),
+        pass: Math.max(1, Math.round(p1.pass + t * (p2.pass - p1.pass)))
+      };
+    }
+  }
+  return { ...points[0] };
+}
+
+function calcElectrodeGeometry(metalKey, s, elementKey, jointKey, elDiam, currentA) {
+  if (metalKey === 'aluminum') {
+    const rSphere = (0.75 * elDiam).toFixed(1).replace('.', ',');
+    const lTrans = Math.round(2 * elDiam);
+    return {
+      angle: "Сфера (притупл. фаска 60°–90°)",
+      coneLen: `Переход 2·dэ (${lTrans} мм)`,
+      trunc: `Сфера R = 0,75·dэ (${rSphere} мм)`,
+      note: "Для AC тока (стр. 3): рабочий торец полусферический."
+    };
+  }
+
+  let baseAngleMin = 25;
+  let baseAngleMax = 30;
+  let coneFactor = 2.5;
+  let truncStr = "Ø 0,2–0,3 мм";
+
+  if (s <= 1.5 || currentA < 75) {
+    baseAngleMin = 15;
+    baseAngleMax = 20;
+    coneFactor = 3.0;
+    truncStr = "Ø 0,15–0,2 мм";
+  } else if (s <= 4.0 && currentA <= 160) {
+    baseAngleMin = 25;
+    baseAngleMax = 30;
+    coneFactor = 2.5;
+    truncStr = "Ø 0,2–0,3 мм";
+  } else if (s <= 12.0 && currentA <= 250) {
+    baseAngleMin = 35;
+    baseAngleMax = 45;
+    coneFactor = 2.2;
+    truncStr = "Ø 0,3–0,4 мм";
+  } else {
+    baseAngleMin = 45;
+    baseAngleMax = 60;
+    coneFactor = 2.0;
+    truncStr = "Ø 0,4–0,6 мм";
+  }
+
+  if (metalKey === 'copper') {
+    baseAngleMin = Math.min(60, baseAngleMin + 10);
+    baseAngleMax = Math.min(75, baseAngleMax + 15);
+    truncStr = "Ø 0,4–0,6 мм";
+  } else if (metalKey === 'titanium' || metalKey === 'stainless') {
+    baseAngleMin = Math.max(15, baseAngleMin - 5);
+    baseAngleMax = Math.max(25, baseAngleMax - 5);
+  }
+
+  let reason = "Стандартный конус для DC- (стр. 3)";
+  if (s > 20.0) {
+    reason = `Для глубокой разделки S=${s.toFixed(1).replace('.',',')} мм: корень варят электродом с углом 20°–25°, а заполнение — ${baseAngleMin}°–${baseAngleMax}°`;
+  } else if (elementKey === 'round_pipe' || jointKey === 'pipe') {
+    const dPipe = parseInt(document.getElementById('pipeDiamSlider').value) || 108;
+    if (dPipe < 60 || s <= 3.5) {
+      baseAngleMin = Math.max(15, baseAngleMin - 5);
+      baseAngleMax = Math.max(25, baseAngleMax - 5);
+      coneFactor = 3.0;
+      reason = `Острый конус для провара корня трубы Ø${dPipe} мм`;
+    } else {
+      reason = `Конус для разделки кольцевого стыка трубы Ø${dPipe} мм`;
+    }
+  } else if (elementKey === 'square_pipe' || elementKey === 'rect_pipe') {
+    baseAngleMin = Math.max(18, baseAngleMin - 4);
+    baseAngleMax = Math.max(28, baseAngleMax - 4);
+    reason = "Удлиненный конус для углов и граней профильной трубы";
+  } else if (jointKey === 'tee' || jointKey === 'corner') {
+    baseAngleMin = Math.max(20, baseAngleMin - 5);
+    baseAngleMax = Math.max(30, baseAngleMax - 5);
+    coneFactor = 2.8;
+    reason = "Узкий конус для доступа в корень угла без блуждания дуги";
+  }
+
+  const lMin = (elDiam * 2).toFixed(1).replace('.', ',');
+  const lMax = (elDiam * 3).toFixed(1).replace('.', ',');
+  const lOpt = (elDiam * coneFactor).toFixed(1).replace('.', ',');
+
+  return {
+    angle: `${baseAngleMin}°–${baseAngleMax}°`,
+    coneLen: `Длина L = ${lOpt} мм (2–3 dэ: ${lMin}–${lMax} мм)`,
+    trunc: `Площадка ${truncStr}`,
+    note: `${reason}. Риски строго вдоль оси!`
+  };
+}
+
+function getGostDesignation(element, joint, s, metalKey) {
+  const sStr = s.toFixed(1).replace('.', ',');
+  if (element === 'round_pipe' || joint === 'pipe') {
+    const dPipe = parseInt(document.getElementById('pipeDiamSlider').value) || 108;
+    if (joint === 'tee' || joint === 'corner') {
+      return {
+        code: `ГОСТ 16037-80 — У19 / У20 — ИНп (Труба Ø${dPipe}×${sStr})`,
+        desc: "Угловое/тавровое трубное соединение (врезка штуцера или приварка фланца с газовой защитой).",
+        prep: `Труба Ø${dPipe}×${sStr} мм: механическая разделка фаски, зазор b = 1,0–2,0 мм, внутренний поддув (стр. 46).`
+      };
+    }
+    if (s <= 3.5) {
+      return {
+        code: `ГОСТ 16037-80 — С2 — ИНп (Труба Ø${dPipe}×${sStr})`,
+        desc: "Стыковое трубное без скоса кромок, одностороннее.",
+        prep: `Труба Ø${dPipe} мм без скоса кромок, зазор b = ${(s <= 2 ? 0.5 : 1.0).toFixed(1).replace('.', ',')} мм, прихватки запилить «на ус».`
+      };
+    } else if (s <= 12.0) {
+      return {
+        code: `ГОСТ 16037-80 — С17 — ИНп (Труба Ø${dPipe}×${sStr})`,
+        desc: "Стыковое трубное со скосом двух кромок (V-образная разделка 60–70°), одностороннее с поддувом корня.",
+        prep: `Труба Ø${dPipe} мм, V-образная разделка (скос кромки 30–35°), притупление c = 1,0–1,5 мм, зазор b = 1,5–2,0 мм.`
+      };
+    } else if (s <= 26.0) {
+      return {
+        code: `ГОСТ 16037-80 — С20 — ИНп (Труба Ø${dPipe}×${sStr})`,
+        desc: "Стыковое трубное с криволинейным (рюмкообразным) скосом двух кромок (стр. 48 пособия).",
+        prep: `Труба Ø${dPipe} мм, криволинейный скос (R = 5 мм, угол скоса 15–30°), притупление c = 1,5–2,0 мм, зазор b = 1,5–2,0 мм.`
+      };
+    } else {
+      return {
+        code: `ГОСТ 16037-80 — С21 / С39 — ИНп (Труба толстостенная Ø${dPipe}×${sStr})`,
+        desc: "Стыковое соединение толстостенных трубопроводов (S = 26–100 мм) со сложным ступенчатым или узкощелевым U-образным скосом кромок.",
+        prep: `Труба Ø${dPipe}×${sStr} мм: ступенчатый скос (35° в корне + 10–15° в верхней части) или U-образная разделка (R = 6 мм), c = 1,5–2,0 мм, b = 1,5–2,5 мм.`
+      };
+    }
+  }
+
+  let profTag = "";
+  if (element === 'square_pipe') {
+    const a = document.getElementById('sqSideSlider').value;
+    profTag = ` | Профиль ⬜ ${a}×${a}×${sStr}`;
+  } else if (element === 'rect_pipe') {
+    const a = document.getElementById('rectASlider').value;
+    const b = document.getElementById('rectBSlider').value;
+    profTag = ` | Профиль ▭ ${a}×${b}×${sStr}`;
+  } else {
+    profTag = ` | Лист/плита S=${sStr} мм`;
+  }
+
+  if (joint === 'butt') {
+    if (s <= 1.2) {
+      return {
+        code: `ГОСТ 14771-76 — С1 / С2 — ИНп${profTag}`,
+        desc: "Стыковое с отбортовкой кромок (С1) или без скоса кромок (С2), одностороннее.",
+        prep: "Без скоса кромок (или с отбортовкой при S = 0,8–1,5 мм), зазор b = 0–0,5 мм."
+      };
+    } else if (s <= 3.5) {
+      return {
+        code: `ГОСТ 14771-76 — С2 (С3) — ИНп${profTag}`,
+        desc: "Стыковое без скоса кромок одностороннее (С2) или на остающейся подкладке (С3).",
+        prep: "Без скоса кромок, зазор b = 0,5–1,0 мм."
+      };
+    } else if (s <= 12.0) {
+      return {
+        code: `ГОСТ 14771-76 — С8 (С17) — ИНп${profTag}`,
+        desc: "Стыковое со скосом одной (С8) или двух кромок V-образное (С17).",
+        prep: `V-образная разделка (угол разделки ${metalKey === 'stainless' ? '45±2°' : '50–60°'}), притупление c = 1,0–1,5 мм, зазор b = 1,0–2,0 мм.`
+      };
+    } else if (s <= 26.0) {
+      return {
+        code: `ГОСТ 14771-76 — С15 / С21 — ИНп${profTag}`,
+        desc: "Стыковое одностороннее с криволинейным U-образным скосом (С15) или двустороннее Х-образное (С21).",
+        prep: "Х-образная или U-образная разделка (R = 5 мм, угол 30°–60°), притупление c = 1,5–2,0 мм, зазор b = 1,5–2,0 мм."
+      };
+    } else if (s <= 60.0) {
+      return {
+        code: `ГОСТ 14771-76 — С25 / С27 — ИНп${profTag}`,
+        desc: "Стыковое двустороннее с криволинейным (двойным U-образным) скосом кромок для толстостенных плит.",
+        prep: "Двусторонняя симметричная U-образная разделка (R = 6–8 мм, скос 10–15° на сторону), притупление в центре c = 2,0–2,5 мм, зазор b = 1,5–2,5 мм."
+      };
+    } else {
+      return {
+        code: `ГОСТ 14771-76 — С27 (Узкощелевая разделка S=${sStr} мм) — ИНп`,
+        desc: "Многослойное стыковое соединение плит особо большой толщины (60–100 мм) с глубокой двухсторонней U-образной или щелевой разделкой.",
+        prep: "Двусторонняя глубокая U-образная или узкощелевая разделка (угол скоса 6–10° на сторону, R = 6–8 мм), c = 2,0–2,5 мм, b = 1,5–2,5 мм."
+      };
+    }
+  }
+
+  if (joint === 'tee') {
+    if (s <= 4.0) {
+      return {
+        code: `ГОСТ 14771-76 — Т1 (Т3) — ИНп${profTag}`,
+        desc: "Тавровое без скоса кромок одностороннее (Т1) или двустороннее (Т3).",
+        prep: `Без скоса кромок, зазор b = 0–1,0 мм, катет углового шва K ≈ ${Math.max(2, Math.round(s * 0.9))} мм.`
+      };
+    } else if (s <= 25.0) {
+      return {
+        code: `ГОСТ 14771-76 — Т6 (Т8) — ИНп${profTag}`,
+        desc: "Тавровое со скосом одной кромки одностороннее (Т6) или двустороннее К-образное (Т8).",
+        prep: `Двусторонний скос вертикальной стенки 45°, притупление c = 1,5–2,0 мм, зазор b = 1,0–2,0 мм.`
+      };
+    } else {
+      return {
+        code: `ГОСТ 14771-76 — Т9 (Криволинейный скос S=${sStr} мм) — ИНп`,
+        desc: "Тавровое двустороннее с криволинейным скосом вертикальной стенки для плит большой толщины.",
+        prep: "Двусторонний J-образный (криволинейный) скос стенки (R = 6–8 мм), притупление c = 2,0–2,5 мм, полный провар корня."
+      };
+    }
+  }
+
+  if (joint === 'corner') {
+    if (s <= 3.5) {
+      return {
+        code: `ГОСТ 14771-76 — У2 (У4) — ИНп${profTag}`,
+        desc: "Угловое без скоса кромок одностороннее (У2) или двустороннее (У4).",
+        prep: "Без скоса кромок, сборка заподлицо или с полным перекрытием торца, зазор b = 0–1,0 мм."
+      };
+    } else {
+      return {
+        code: `ГОСТ 14771-76 — У6 / У8 / У10 — ИНп${profTag}`,
+        desc: "Угловое со скосом кромок и подваркой корня для средних и больших толщин.",
+        prep: "Односторонний или двусторонний скос кромок 45°, притупление c = 1,5–2,0 мм, зазор b = 1,0–2,0 мм."
+      };
+    }
+  }
+
+  return {
+    code: `ГОСТ 14771-76 — Н1 (Н2) — ИНп${profTag}`,
+    desc: "Нахлесточное без скоса кромок одностороннее (Н1) или двустороннее (Н2).",
+    prep: `Без скоса кромок, величина нахлестки не менее ${Math.round(s * 4)} мм (4·S), плотное прижатие элементов.`
+  };
+}
+
+function calculateRegime() {
+  const metalKey = document.getElementById('metalSelect').value;
+  const s = parseFloat(document.getElementById('thickSlider').value);
+  const posKey = document.getElementById('posSelect').value;
+  const gasKey = document.getElementById('gasSelect').value;
+
+  const mData = METALS[metalKey];
+  const posData = POSITIONS[posKey];
+  const gasData = GASES[gasKey];
+
+  const warnBox = document.getElementById('gas-warn');
+  warnBox.style.display = 'none';
+  if (gasKey === 'n2' && metalKey !== 'copper') {
+    warnBox.style.display = 'block';
+    warnBox.innerHTML = "⚠️ <strong>Внимание (стр. 3, 41):</strong> Азот (N₂) применяется ТОЛЬКО для сварки меди! На сталях, алюминии и титане азот вызывает нитридное охрупчивание и поры.";
+  } else if (gasKey === 'ar_o2' && metalKey !== 'stainless' && metalKey !== 'carbon') {
+    warnBox.style.display = 'block';
+    warnBox.innerHTML = "⚠️ <strong>Внимание (стр. 29):</strong> Добавка 2–5% кислорода (O₂) допустима только для сталей!";
+  }
+
+  const base = interpPoints(mData.points, s);
+
+  let geomFactor = 1.0;
+  if (currentJoint === 'tee' || currentJoint === 'lap') geomFactor = 1.08;
+  if (currentElement === 'round_pipe' || currentJoint === 'pipe') {
+    const dPipe = parseInt(document.getElementById('pipeDiamSlider').value) || 108;
+    geomFactor = (dPipe < 57) ? 0.88 : 0.94;
+  } else if (currentElement === 'square_pipe' || currentElement === 'rect_pipe') {
+    geomFactor = 0.94;
+  }
+
+  const adjCurrent = Math.round(base.i * posData.factor * geomFactor * gasData.currMult);
+  const minI = Math.round(adjCurrent * 0.95);
+  const maxI = Math.round(adjCurrent * 1.05);
+
+  // Ток для корневого прохода при многослойной сварке (S > 4 мм)
+  let rootInfo = mData.polarity;
+  if (s >= 4.0) {
+    const rootI = Math.min(adjCurrent, Math.round((metalKey === 'aluminum' ? 140 : (metalKey === 'copper' ? 210 : 115)) * posData.factor));
+    rootInfo = `Корень: ${rootI - 10}–${rootI + 10} А (${mData.polarity.split(' ')[0]})`;
+  }
+
+  // Предупреждение о водяном охлаждении горелки (стр. 13-14)
+  const coolBox = document.getElementById('cooling-warn');
+  if (maxI > 150) {
+    coolBox.style.display = 'block';
+    coolBox.innerHTML = `💧 <strong>Водяное охлаждение горелки (стр. 13–14):</strong> При токе свыше 150 А (расчетный до ${maxI} А) обязательно используйте горелки с жидкостным охлаждением (ГСН-1, Агни-07М/13М/17М, ГР-6, ГР-10, ГДС-500В).`;
+  } else {
+    coolBox.style.display = 'none';
+  }
+
+  let calcGasFlow = Math.round(base.gas * gasData.flowMult);
+  if (gasKey === 'n2' && metalKey === 'copper') {
+    calcGasFlow = 17;
+  }
+  const minFlow = Math.max(4, calcGasFlow - 1);
+  const maxFlow = calcGasFlow + 2;
+
+  const elGeom = calcElectrodeGeometry(metalKey, s, currentElement, currentJoint, base.el, adjCurrent);
+  const gost = getGostDesignation(currentElement, currentJoint, s, metalKey);
+
+  document.getElementById('res-gost-code').textContent = `${gost.code} | Положение: ${posData.code}`;
+  document.getElementById('res-gost-desc').textContent = gost.desc;
+
+  document.getElementById('res-current').textContent = `${minI}–${maxI} А`;
+  document.getElementById('res-root-current').textContent = rootInfo;
+  document.getElementById('res-el-diam').textContent = `Ø ${base.el.toFixed(1).replace('.', ',')} мм`;
+  document.getElementById('res-voltage').textContent = `Напряжение дуги: ${gasData.voltage}`;
+
+  document.getElementById('res-angle').textContent = elGeom.angle;
+  document.getElementById('res-cone-len').textContent = elGeom.coneLen;
+  document.getElementById('res-trunc').textContent = elGeom.trunc;
+  document.getElementById('res-sharpen-note').textContent = elGeom.note;
+
+  document.getElementById('res-tungsten-badge').innerHTML =
+    `<span class="color-dot" style="background:${mData.tungsten.color}"></span> ${mData.tungsten.name} | ${mData.polarity}`;
+
+  if (s >= 6.0) {
+    document.getElementById('res-filler-diam').textContent = `Ø 2,0 (корень) / Ø ${base.fil.toFixed(1).replace('.', ',')} мм`;
+  } else {
+    document.getElementById('res-filler-diam').textContent = `Ø ${base.fil.toFixed(1).replace('.', ',')} мм`;
+  }
+  const layersCount = Math.max(1, Math.round(s / 2.2));
+  document.getElementById('res-passes').textContent = s > 6.0 ? `Проходов: ~${base.pass} (слоев: ~${layersCount})` : `Проходов: ${base.pass}`;
+
+  document.getElementById('res-gas-flow').textContent = `${minFlow}–${maxFlow} л/мин`;
+  document.getElementById('res-gas-type').textContent = gasData.name;
+  document.getElementById('res-nozzle').textContent = `Ø ${base.noz} мм ${maxI > 250 ? '(медное водоохл.)' : '(керамика)'}`;
+  document.getElementById('res-arc-len').textContent = `Длина дуги: ${gasData.arcLen}`;
+
+  if (currentElement === 'round_pipe' || currentJoint === 'pipe' || metalKey === 'stainless' || metalKey === 'titanium') {
+    document.getElementById('res-purge').textContent = "Поддув корня: 8–15 л/мин (Ar)";
+  } else {
+    document.getElementById('res-purge').textContent = "До детали: 7–15 мм";
+  }
+
+  let stickout = "3–5 мм";
+  if (s > 16.0) {
+    stickout = "7–10 мм (с газовой линзой в глубокую разделку)";
+  } else if (metalKey === 'aluminum') {
+    stickout = (currentJoint === 'butt' && currentElement === 'sheet') ? "1–1,5 мм" : "4–8 мм";
+  } else if (metalKey === 'copper') {
+    stickout = "5–7 мм";
+  } else if (currentJoint === 'tee' || currentJoint === 'corner' || currentElement !== 'sheet') {
+    stickout = "5–8 мм";
+  }
+  document.getElementById('res-stickout').textContent = stickout;
+  document.getElementById('res-filler-grades').textContent = mData.fillerGrades;
+
+  const notes = [
+    `<li><strong>Подготовка кромок:</strong> ${gost.prep}</li>`,
+    `<li><strong>Защитный газ (${gasData.name}):</strong> ${gasData.note}</li>`,
+    `<li><strong>Заточка электрода:</strong> угол при вершине <strong>${elGeom.angle}</strong>, ${elGeom.coneLen.toLowerCase()}, ${elGeom.trunc.toLowerCase()}. ${elGeom.note}</li>`,
+    `<li><strong>Техника для положения ${posData.code}:</strong> ${posData.text}</li>`
+  ];
+
+  // Специальные указания для больших толщин (S от 12 до 100 мм)
+  if (s > 12.0) {
+    notes.push(`<li><strong>Многослойная сварка большой толщины (S = ${s.toFixed(1).replace('.',',')} мм):</strong> высота одного наплавленного слоя выдерживается в пределах 2,0–2,5 мм (стр. 27). Корень шва (1–2 прохода) выполняется с полным проплавлением притупления, затем разделка заполняется за ~${base.pass} проходов с обязательной межслойной зачисткой щеткой из нержавеющей стали.</li>`);
+    if (metalKey === 'carbon') {
+      notes.push(`<li><strong>Подогрев сталей при S &gt; 16 мм:</strong> рекомендуется предварительный и сопутствующий подогрев кромок до 150–250 °C (для теплоустойчивых сталей типа 12Х1МФ — 250–350 °C с последующим отпуском).</li>`);
+    } else if (metalKey === 'stainless') {
+      notes.push(`<li><strong>Контроль межслойной температуры (стр. 29–31):</strong> при многопроходной сварке нержавеющей стали толщиной ${s.toFixed(1).replace('.',',')} мм охлаждайте предыдущий валик ниже 100–120 °C перед наложением следующего во избежание горячих трещин и МКК.</li>`);
+    } else if (metalKey === 'aluminum') {
+      notes.push(`<li><strong>Толстостенный алюминий (стр. 32–35):</strong> при S &gt; 10–12 мм сварку ведут «углом назад», применяют предварительный подогрев 200–250 °C и гелиево-аргоновую смесь (60–65% He + 35–40% Ar) для гарантированного сплавления кромок.</li>`);
+    } else if (metalKey === 'copper') {
+      notes.push(`<li><strong>Толстостенная медь (стр. 38–42):</strong> обязателен предварительный и сопутствующий подогрев до 300–450 °C (для бронз — 500–600 °C) и сварка в гелии или смеси Ar+He.</li>`);
+    } else if (metalKey === 'titanium') {
+      notes.push(`<li><strong>Толстостенный титан (стр. 44–48):</strong> каждый из ~${base.pass} проходов охлаждают под непрерывной защитой аргона (насадкой длиной 60–120 мм или в камере) до температуры ниже 250–300 °C.</li>`);
+    }
+  }
+
+  if (currentElement === 'round_pipe') {
+    const dPipe = parseInt(document.getElementById('pipeDiamSlider').value) || 108;
+    const perimMm = Math.round(Math.PI * dPipe);
+    notes.push(`<li><strong>Круглая труба Ø${dPipe}×${s.toFixed(1).replace('.',',')} мм:</strong> длина одного кольцевого прохода составляет ${perimMm} мм (${(perimMm/1000).toFixed(2).replace('.',',')} м).</li>`);
+  }
+
+  document.getElementById('res-notes').innerHTML = notes.join('');
+
+  document.getElementById('cyc-preflow').textContent = mData.preflow;
+  document.getElementById('cyc-main').textContent = `${adjCurrent} А`;
+  document.getElementById('cyc-pulse').textContent = `${Math.round(adjCurrent * 1.25)} А / ${Math.round(adjCurrent * 0.35)} А`;
+  document.getElementById('cyc-crater').textContent = `${Math.round(adjCurrent / 2.8)} А (снижение в 2,5–3 раза)`;
+  document.getElementById('cyc-postflow').textContent = mData.postflow;
+}
+
+function onNormSlider() {
+  const s = parseFloat(document.getElementById('normSlider').value);
+  document.getElementById('normInput').value = s.toFixed(1);
+  calcNorms();
+}
+
+function onNormNumber() {
+  let s = parseFloat(document.getElementById('normInput').value);
+  if (isNaN(s)) return;
+  s = Math.max(0.5, Math.min(100.0, s));
+  document.getElementById('normSlider').value = s;
+  calcNorms();
+}
+
+function usePipePerimeterInNorms() {
+  let perimM = 1.0;
+  if (currentElement === 'round_pipe') {
+    const d = parseInt(document.getElementById('pipeDiamSlider').value) || 108;
+    perimM = Math.PI * d / 1000;
+  } else if (currentElement === 'square_pipe') {
+    const a = parseInt(document.getElementById('sqSideSlider').value) || 60;
+    perimM = 4 * a / 1000;
+  } else if (currentElement === 'rect_pipe') {
+    const a = parseInt(document.getElementById('rectASlider').value) || 80;
+    const b = parseInt(document.getElementById('rectBSlider').value) || 40;
+    perimM = 2 * (a + b) / 1000;
+  }
+  const s = parseFloat(document.getElementById('thickSlider').value);
+  document.getElementById('weldLen').value = perimM.toFixed(2);
+  document.getElementById('normSlider').value = s;
+  document.getElementById('normInput').value = s.toFixed(1);
+  calcNorms();
+}
+
+function calcNorms() {
+  const m = document.getElementById('normMetal').value;
+  const g = document.getElementById('normGas').value;
+  const s = parseFloat(document.getElementById('normSlider').value);
+  const len = parseFloat(document.getElementById('weldLen').value) || 0;
+
+  const gasMult = GASES[g] ? GASES[g].flowMult : 1.0;
+  const baseReg = interpPoints(METALS[m].points, s);
+  const passes = baseReg.pass;
+
+  let wUnit = (m === 'aluminum') ? "г" : "мм стержня";
+  // Базовый расход на 1 проход 100 м и масштабирование по числу проходов для толщин до 100 мм
+  let singlePassW100 = (m === 'aluminum') ? (8.3 + Math.min(s, 6) * 20.6) : (8.0 + Math.min(s, 4) * 31.0);
+  const w100 = singlePassW100 * (s <= 6 ? 1.0 : (1.0 + (passes - 2) * 0.42));
+
+  // Расход газа на 1 пог. м шва с учетом всех проходов в разделке (л/м)
+  let singlePassGasPerM = (baseReg.gas * 6.5);
+  if (m === 'titanium') singlePassGasPerM *= 1.65; // с учетом насадки и поддува
+  const totalGasPerM = singlePassGasPerM * passes * gasMult * (s > 6 ? 0.72 : 1.0);
+
+  const wTotal = (w100 * (len / 100)).toFixed(1);
+  const gasMinTotal = Math.round(totalGasPerM * 0.9 * len);
+  const gasMaxTotal = Math.round(totalGasPerM * 1.1 * len);
+  const avgGas = (gasMinTotal + gasMaxTotal) / 2;
+  const cylCount = (avgGas / 6200).toFixed(2);
+  const cylPct = (avgGas / 6200 * 100).toFixed(1);
+
+  document.getElementById('norm-el').textContent = `Ø ${baseReg.el.toFixed(1).replace('.', ',')} мм`;
+  document.getElementById('norm-passes-sub').textContent = `Учтено проходов: ${passes}`;
+  document.getElementById('norm-w-val').textContent = `${wTotal} ${wUnit}`;
+  document.getElementById('norm-w-unit').textContent = `Норма: ${w100.toFixed(0)} ${wUnit} / 100 м`;
+  document.getElementById('norm-ar-val').textContent = `${gasMinTotal}–${gasMaxTotal} л`;
+  document.getElementById('norm-ar-sub').textContent = `Удельный (${GASES[g].name.split(' ')[0]}): ~${Math.round(totalGasPerM)} л/м`;
+  document.getElementById('norm-cyl').textContent = avgGas > 6200 ? `${cylCount} балл.` : `${cylPct}% балл.`;
+}
+
+function switchTab(tabId, btn) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + tabId).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+onMetalChange();
+updatePipePerimDisplay(108);
+onSqSideInput();
+onRectSideInput();
+calcNorms();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>

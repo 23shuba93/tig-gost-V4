@@ -1,0 +1,19 @@
+{
+  "name": "TIG Справочник Сварщика v4 (до 100 мм | ГОСТ / НАКС)",
+  "short_name": "TIG ГОСТ v4",
+  "description": "Автономный справочник и калькулятор режимов TIG/WIG сварки (толщины 0,5–100 мм) по пособию Н.А. Юхина и ГОСТ",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
